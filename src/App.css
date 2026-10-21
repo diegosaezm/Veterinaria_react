@@ -1,184 +1,438 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
 
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+/* Colores principales de Veterinaria San Marcos */
+:root {
+  --color-principal: #126b68;
+  --color-principal-oscuro: #0d504e;
+  --color-secundario: #e7f4f1;
+  --color-acento: #f5b971;
+  --color-texto: #253746;
 }
 
-.hero {
+/* Botones principales */
+.btn-primary {
+  background-color: var(--color-principal);
+  border-color: var(--color-principal);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-principal-oscuro);
+  border-color: var(--color-principal-oscuro);
+}
+
+/* Botones secundarios */
+.btn-outline-primary {
+  color: var(--color-principal);
+  border-color: var(--color-principal);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--color-principal);
+  border-color: var(--color-principal);
+  color: white;
+}
+
+/* Tarjetas de servicios y citas */
+.card {
+  border: 1px solid #e3eeeb;
+  border-radius: 16px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Formularios */
+.form-control,
+.form-select {
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--color-principal);
+  box-shadow: 0 0 0 0.2rem rgba(18, 107, 104, 0.15);
+}
+
+/* Navegación */
+.navbar {
+  background-color: white !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.navbar-brand {
+  color: var(--color-principal);
+  font-weight: 700;
+}
+
+.nav-link:hover {
+  color: var(--color-principal);
+}
+
+
+/* Logo y navegación */
+.logo-veterinaria {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 43px;
+  height: 43px;
+  background: var(--color-secundario);
+  border-radius: 13px;
+  font-size: 24px;
+}
+
+.navbar {
+  padding: 16px 0;
+}
+
+.navbar-brand {
+  font-size: 20px;
+}
+
+.nav-link.active {
+  color: var(--color-principal) !important;
+  font-weight: 700;
+}
+
+/* Sección principal */
+.hero-principal {
+  background: linear-gradient(135deg, #e7f4f1 0%, #ffffff 75%);
+  padding: 85px 0;
+  overflow: hidden;
+}
+
+.hero-etiqueta {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 30px;
+  color: var(--color-principal);
+  background: #d5ece6;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.hero-titulo {
+  font-size: clamp(36px, 4.5vw, 62px);
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+  color: #173f42;
+}
+
+.hero-descripcion {
+  font-size: 18px;
+  color: #526b72;
+  max-width: 540px;
+}
+
+.hero-beneficios {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  color: #126b68;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.hero-imagen-contenedor {
   position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+  max-width: 550px;
+  margin: auto;
 }
 
-#center {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
-}
-
-#next-steps {
-  display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-#next-steps ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
-}
-
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
-}
-
-.ticks {
-  position: relative;
+.hero-imagen {
   width: 100%;
+  height: 440px;
+  object-fit: cover;
+  border-radius: 30px;
+  box-shadow: 0 20px 50px rgba(18, 107, 104, 0.15);
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
+.hero-mensaje {
+  position: absolute;
+  bottom: 25px;
+  left: -20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 16px 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.hero-mensaje strong,
+.hero-mensaje small {
+  display: block;
+}
+
+.hero-mensaje small {
+  color: #64748b;
+}
+
+/* Ajustes para celular */
+@media (max-width: 767px) {
+  .hero-principal {
+    padding: 50px 0;
   }
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
+  .hero-titulo {
+    letter-spacing: -0.5px;
   }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
+
+  .hero-imagen {
+    height: 320px;
   }
+
+  .hero-mensaje {
+    left: 10px;
+    bottom: 15px;
+    padding: 12px;
+  }
+
+  .navbar-brand {
+    font-size: 16px;
+  }
+}
+
+/* Tarjetas de servicios */
+.servicio-card {
+  overflow: hidden;
+  border: none;
+  border-radius: 20px;
+}
+
+.servicio-imagen {
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+}
+
+.servicio-card .card-title {
+  color: var(--color-principal-oscuro);
+}
+
+.servicio-card .btn {
+  border-radius: 10px;
+  padding: 10px 20px;
+}
+
+
+/* Página de detalle de servicios */
+
+.detalle-servicio {
+  background: linear-gradient(135deg, #f0f9f6, #ffffff);
+  min-height: 85vh;
+}
+
+.detalle-imagen {
+  width: 100%;
+  height: 440px;
+  object-fit: cover;
+  border-radius: 24px;
+  box-shadow: 0 15px 40px rgba(18, 107, 104, 0.12);
+}
+
+.detalle-etiqueta {
+  display: inline-block;
+  background: #d5ece6;
+  color: #126b68;
+  padding: 10px 18px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.detalle-titulo {
+  font-size: clamp(32px, 4vw, 52px);
+  color: #173f42;
+}
+
+.detalle-descripcion {
+  font-size: 19px;
+  color: #526b72;
+  line-height: 1.8;
+}
+
+.detalle-precio {
+  background: white;
+  border: 1px solid #e3eeeb;
+  border-radius: 16px;
+  padding: 20px 25px;
+}
+
+.detalle-precio span {
+  color: #64748b;
+  font-size: 15px;
+}
+
+.detalle-precio h2 {
+  color: #126b68;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.detalle-beneficios p {
+  color: #126b68;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 767px) {
+  .detalle-imagen {
+    height: 280px;
+  }
+
+  .detalle-descripcion {
+    font-size: 16px;
+  }
+}
+
+
+/* Sección de agendamiento */
+.agendar-seccion {
+  background: linear-gradient(135deg, #f0f9f6, #ffffff);
+  min-height: 85vh;
+}
+
+.agendar-contenedor {
+  max-width: 1050px;
+  overflow: hidden;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(18, 107, 104, 0.1);
+}
+
+.agendar-info {
+  background: #126b68;
+  color: white;
+  padding: 45px 35px;
+}
+
+.agendar-info p {
+  color: #e2f3ef;
+}
+
+.agendar-icono {
+  font-size: 58px;
+  text-align: center;
+}
+
+.agendar-formulario {
+  padding: 45px;
+}
+
+.agendar-formulario .form-label {
+  font-weight: 600;
+  color: #173f42;
+}
+
+.agendar-formulario .form-control,
+.agendar-formulario .form-select {
+  background: #fbfdfc;
+  border: 1px solid #dce9e5;
+}
+
+@media (max-width: 767px) {
+  .agendar-info {
+    padding: 30px 24px;
+  }
+
+  .agendar-formulario {
+    padding: 28px 20px;
+  }
+
+  .agendar-contenedor {
+    border-radius: 16px;
+  }
+}
+
+
+
+/* Página Mis citas */
+
+.citas-seccion {
+  background: linear-gradient(135deg, #f0f9f6, #ffffff);
+  min-height: 85vh;
+}
+
+.cita-card {
+  border: 1px solid #e1eeea;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 8px 25px rgba(18, 107, 104, 0.06);
+  overflow: hidden;
+}
+
+.cita-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: #e7f4f1;
+  border-radius: 14px;
+  font-size: 25px;
+}
+
+.cita-estado {
+  background: #e7f4f1;
+  color: #126b68;
+  padding: 7px 12px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cita-nombre {
+  color: #173f42;
+}
+
+.cita-datos {
+  background: #f8fbfa;
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.cita-datos p {
+  margin-bottom: 10px;
+  color: #526b72;
+}
+
+.cita-datos p:last-child {
+  margin-bottom: 0;
+}
+
+.cita-datos strong {
+  color: #173f42;
+}
+
+.cita-acciones .btn {
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.cita-edicion {
+  border-top: 1px solid #e1eeea;
+  padding-top: 22px;
+}
+
+.cita-edicion .form-label {
+  font-weight: 600;
+  color: #173f42;
+}
+
+.citas-vacio {
+  max-width: 520px;
+  background: white;
+  padding: 55px 30px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(18, 107, 104, 0.07);
+}
+
+.citas-vacio-icono {
+  font-size: 65px;
+  margin-bottom: 20px;
 }

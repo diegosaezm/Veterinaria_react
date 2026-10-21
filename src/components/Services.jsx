@@ -20,6 +20,7 @@ function Services() {
             nombre={service.nombre}
             precio={service.precio}
             descripcion={service.descripcion}
+            imagen={service.imagen}
           />
         ))}
       </div>

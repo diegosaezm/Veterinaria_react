@@ -1,10 +1,13 @@
+import Hero from "../components/Hero";
+import Services from "../components/Services";
+
 function Home() {
   return (
-    <div className="container py-5">
-      <h1>Inicio</h1>
-      <p>Bienvenido a Veterinaria San Marcos.</p>
-    </div>
-  )
+    <>
+      <Hero />
+      <Services />
+    </>
+  );
 }
 
-export default Home
+export default Home;
