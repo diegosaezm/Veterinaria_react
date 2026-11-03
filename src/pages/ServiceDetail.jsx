@@ -73,7 +73,7 @@ function ServiceDetail() {
               to="/agendar"
               className="btn btn-primary btn-lg mt-3"
             >
-              Agendar este servicio
+              Agendar este servici
             </Link>
           </div>
 
