@@ -1,57 +1,29 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+import { apiFetch } from "./apiFetch";
 
-const CITAS_URL = `${API_URL}/api/v1/citas`;
-
-// Procesar las respuestas del backend
-async function procesarRespuesta(respuesta) {
-  if (!respuesta.ok) {
-    throw new Error(`Error HTTP: ${respuesta.status}`);
-  }
-
-  if (respuesta.status === 204) {
-    return null;
-  }
-
-  return respuesta.json();
-}
-
-// GET: obtener todas las citas
+// GET: Listar citas
 export async function obtenerCitas() {
-  const respuesta = await fetch(CITAS_URL);
-  return procesarRespuesta(respuesta);
+  return apiFetch("/api/v1/citas");
 }
 
-// POST: crear una cita
+// POST: Crear cita
 export async function crearCita(cita) {
-  const respuesta = await fetch(CITAS_URL, {
+  return apiFetch("/api/v1/citas", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(cita),
   });
-
-  return procesarRespuesta(respuesta);
 }
 
-// PUT: actualizar una cita
+// PUT: Actualizar cita
 export async function actualizarCita(id, cita) {
-  const respuesta = await fetch(`${CITAS_URL}/${id}`, {
+  return apiFetch(`/api/v1/citas/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(cita),
   });
-
-  return procesarRespuesta(respuesta);
 }
 
-// DELETE: eliminar una cita
+// DELETE: Eliminar cita
 export async function eliminarCita(id) {
-  const respuesta = await fetch(`${CITAS_URL}/${id}`, {
+  return apiFetch(`/api/v1/citas/${id}`, {
     method: "DELETE",
   });
-
-  return procesarRespuesta(respuesta);
 }

@@ -1,25 +1,76 @@
 import { createContext, useState, useContext, useEffect } from "react";
+
 import { obtenerProductos } from "../services/productoService";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
+  const { token } = useAuth();
+
   const [carrito, setCarrito] = useState([]);
   const [productos, setProductos] = useState([]);
+  const [cargandoProductos, setCargandoProductos] = useState(false);
 
-  // GET: Cargar productos desde Spring Boot y MySQL
+  // Sincronizar productos y stock con MySQL
+  function actualizarInventario(datos) {
+    setProductos(datos);
+
+    setCarrito((carritoAnterior) =>
+      carritoAnterior
+        .map((productoCarrito) => {
+          const productoActualizado = datos.find(
+            (p) => p.id === productoCarrito.id,
+          );
+
+          if (!productoActualizado || productoActualizado.stock <= 0) {
+            return null;
+          }
+
+          return {
+            ...productoActualizado,
+            cantidad: Math.min(
+              productoCarrito.cantidad,
+              productoActualizado.stock,
+            ),
+          };
+        })
+        .filter(Boolean),
+    );
+  }
+
+  // Cargar productos al iniciar sesion
   useEffect(() => {
     let activo = true;
 
+    if (!token) {
+      setProductos([]);
+      setCarrito([]);
+      setCargandoProductos(false);
+
+      return () => {
+        activo = false;
+      };
+    }
+
     async function cargarProductos() {
+      setCargandoProductos(true);
+
       try {
         const datos = await obtenerProductos();
 
         if (activo) {
-          setProductos(datos);
+          actualizarInventario(datos);
         }
       } catch (error) {
-        console.error("Error al cargar productos del carrito:", error);
+        if (activo) {
+          console.error("Error al cargar productos del carrito:", error);
+          setProductos([]);
+        }
+      } finally {
+        if (activo) {
+          setCargandoProductos(false);
+        }
       }
     }
 
@@ -28,9 +79,19 @@ export function CartProvider({ children }) {
     return () => {
       activo = false;
     };
-  }, []);
+  }, [token]);
 
-  // Agregar productos al carrito
+  // Volver a consultar el inventario despues de una compra
+  async function recargarProductos() {
+    if (!token) return [];
+
+    const datos = await obtenerProductos();
+    actualizarInventario(datos);
+
+    return datos;
+  }
+
+  // Agregar un producto al carrito
   function agregarAlCarrito(id) {
     const producto = productos.find((p) => p.id === id);
 
@@ -58,7 +119,7 @@ export function CartProvider({ children }) {
     setCarrito((carritoAnterior) => carritoAnterior.filter((p) => p.id !== id));
   }
 
-  // Disminuir una unidad
+  // Disminuir cantidad
   function disminuirCantidad(id) {
     setCarrito((carritoAnterior) =>
       carritoAnterior
@@ -76,10 +137,13 @@ export function CartProvider({ children }) {
     <CartContext.Provider
       value={{
         carrito,
+        productos,
+        cargandoProductos,
         agregarAlCarrito,
         eliminarDelCarrito,
         disminuirCantidad,
         vaciarCarrito,
+        recargarProductos,
       }}
     >
       {children}

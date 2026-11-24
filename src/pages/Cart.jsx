@@ -10,14 +10,18 @@ function Cart() {
     disminuirCantidad,
     eliminarDelCarrito,
     vaciarCarrito,
+    recargarProductos,
   } = useCart();
 
   const [comprando, setComprando] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
+  const [aviso, setAviso] = useState("");
 
+  // Calcular el total mostrado en React
   const totalCompra = carrito.reduce(
-    (total, p) => total + p.precio * p.cantidad,
+    (total, producto) =>
+      total + producto.precio * producto.cantidad,
     0
   );
 
@@ -28,27 +32,53 @@ function Cart() {
     setComprando(true);
     setMensaje("");
     setError("");
+    setAviso("");
 
     try {
-      // Enviar los productos y cantidades al backend
+      // 1. Enviar los productos al backend
       const compraGuardada = await registrarCompra(carrito);
 
-      console.log("Compra registrada en MySQL:", compraGuardada);
+      console.log(
+        "Compra registrada en MySQL:",
+        compraGuardada
+      );
 
-      // Mostrar los datos reales devueltos por Spring Boot
+      // 2. La compra ya fue confirmada por Spring Boot
+      vaciarCarrito();
+
       setMensaje(
         `¡Compra #${compraGuardada.id} registrada correctamente! ` +
         `Total: $${compraGuardada.total.toLocaleString("es-CL")}`
       );
 
-      // Vaciar solamente después de confirmar la compra
-      vaciarCarrito();
+      // 3. Sincronizar el inventario con MySQL
+      try {
+        await recargarProductos();
+
+      } catch (errorInventario) {
+        console.error(
+          "Error al actualizar el inventario:",
+          errorInventario
+        );
+
+        // La compra fue exitosa aunque falle esta consulta
+        setAviso(
+          "La compra fue registrada, pero no se pudo " +
+          "actualizar el inventario mostrado. " +
+          "Recarga la página para consultar el stock."
+        );
+      }
 
     } catch (err) {
-      console.error("Error al registrar compra:", err);
+      console.error(
+        "Error al registrar la compra:",
+        err
+      );
 
+      // Si el POST falla, conservamos el carrito
       setError(
-        err.message || "No fue posible registrar la compra."
+        err.message ||
+        "No fue posible registrar la compra."
       );
 
     } finally {
@@ -58,19 +88,29 @@ function Cart() {
 
   return (
     <div className="container py-5">
+
       <h1 className="text-center mb-4">
         Mi carrito
       </h1>
 
+      {/* Confirmación de compra */}
       {mensaje && (
         <div className="alert alert-success" role="status">
           {mensaje}
         </div>
       )}
 
+      {/* Error al registrar la compra */}
       {error && (
         <div className="alert alert-danger" role="alert">
           {error}
+        </div>
+      )}
+
+      {/* Error al sincronizar inventario */}
+      {aviso && (
+        <div className="alert alert-warning" role="status">
+          {aviso}
         </div>
       )}
 
@@ -80,16 +120,21 @@ function Cart() {
         </p>
       ) : (
         <div className="row g-3">
+
           {carrito.map((p) => (
             <div className="col-12" key={p.id}>
+
               <div className="card p-3 shadow-sm">
+
                 <h4>{p.nombre}</h4>
 
                 <p>
-                  Precio: ${p.precio.toLocaleString("es-CL")}
+                  Precio: $
+                  {p.precio.toLocaleString("es-CL")}
                 </p>
 
                 <div className="d-flex align-items-center gap-3">
+
                   <button
                     type="button"
                     className="btn btn-outline-secondary"
@@ -107,7 +152,10 @@ function Cart() {
                     type="button"
                     className="btn btn-outline-primary"
                     onClick={() => agregarAlCarrito(p.id)}
-                    disabled={comprando || p.cantidad >= p.stock}
+                    disabled={
+                      comprando ||
+                      p.cantidad >= p.stock
+                    }
                   >
                     +
                   </button>
@@ -120,17 +168,21 @@ function Cart() {
                   >
                     Eliminar
                   </button>
+
                 </div>
               </div>
             </div>
           ))}
+
         </div>
       )}
 
       {carrito.length > 0 && (
         <div className="card p-4 mt-4 shadow-sm">
+
           <h3 className="text-end">
-            Total: ${totalCompra.toLocaleString("es-CL")}
+            Total: $
+            {totalCompra.toLocaleString("es-CL")}
           </h3>
 
           <button
@@ -152,8 +204,10 @@ function Cart() {
               ? "Procesando compra..."
               : "Finalizar compra"}
           </button>
+
         </div>
       )}
+
     </div>
   );
 }
