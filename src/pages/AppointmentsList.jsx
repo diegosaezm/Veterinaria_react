@@ -1,43 +1,92 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { MemoryRouter } from "react-router-dom";
 
 import {
   obtenerCitas,
-  eliminarCita as eliminarCitaGuardada,
+  eliminarCita as eliminarCitaAPI,
   actualizarCita,
-} from "../Data/appointments";
+} from "../services/citaService";
 
 function AppointmentsList() {
-  // Estados
-  const [citas, setCitas] = useState(() => obtenerCitas());
-  const [editandoIndex, setEditandoIndex] = useState(null);
+  const [citas, setCitas] = useState([]);
+  const [editandoId, setEditandoId] = useState(null);
+
   const [nombreEditado, setNombreEditado] = useState("");
   const [mascotaEditada, setMascotaEditada] = useState("");
   const [servicioEditado, setServicioEditado] = useState("");
   const [fechaEditada, setFechaEditada] = useState("");
 
-  // DELETE: Eliminar una cita
-  function eliminarCita(index) {
-    const nuevasCitas = eliminarCitaGuardada(index);
-    setCitas(nuevasCitas);
-    setEditandoIndex(null);
+  const [cargando, setCargando] = useState(true);
+  const [procesandoId, setProcesandoId] = useState(null);
+  const [error, setError] = useState("");
+
+  // GET: Cargar las citas desde Spring Boot
+  useEffect(() => {
+    let activo = true;
+
+    async function cargarCitas() {
+      try {
+        const datos = await obtenerCitas();
+
+        if (activo) {
+          setCitas(datos);
+        }
+      } catch (err) {
+        console.error("Error al obtener citas:", err);
+
+        if (activo) {
+          setError("No se pudieron cargar las citas.");
+        }
+      } finally {
+        if (activo) {
+          setCargando(false);
+        }
+      }
+    }
+
+    cargarCitas();
+
+    return () => {
+      activo = false;
+    };
+  }, []);
+
+  // DELETE: Eliminar una cita de MySQL
+  async function eliminarCita(id) {
+    setError("");
+    setProcesandoId(id);
+
+    try {
+      await eliminarCitaAPI(id);
+
+      setCitas((actuales) =>
+        actuales.filter((cita) => cita.id !== id)
+      );
+
+      setEditandoId((actual) =>
+        actual === id ? null : actual
+      );
+    } catch (err) {
+      console.error("Error al eliminar cita:", err);
+      setError("No se pudo eliminar la cita.");
+    } finally {
+      setProcesandoId(null);
+    }
   }
 
-  // Activar el formulario de edición
-  function comenzarEdicion(index) {
-    const cita = citas[index];
-
-    setEditandoIndex(index);
+  // Activar formulario de edición
+  function comenzarEdicion(cita) {
+    setEditandoId(cita.id);
     setNombreEditado(cita.nombre);
     setMascotaEditada(cita.mascota);
     setServicioEditado(cita.servicio);
     setFechaEditada(cita.fecha);
+    setError("");
   }
 
-  // UPDATE: Guardar los cambios
-  function guardarEdicion() {
+  // PUT: Actualizar una cita en MySQL
+  async function guardarEdicion() {
     if (
       !nombreEditado.trim() ||
       !mascotaEditada.trim() ||
@@ -48,26 +97,40 @@ function AppointmentsList() {
       return;
     }
 
-    const citaActualizada = {
+    const datosActualizados = {
       nombre: nombreEditado.trim(),
       mascota: mascotaEditada.trim(),
       servicio: servicioEditado.trim(),
       fecha: fechaEditada,
     };
 
-    const nuevasCitas = actualizarCita(
-      editandoIndex,
-      citaActualizada
-    );
+    setError("");
+    setProcesandoId(editandoId);
 
-    setCitas(nuevasCitas);
-    setEditandoIndex(null);
+    try {
+      const citaGuardada = await actualizarCita(
+        editandoId,
+        datosActualizados
+      );
+
+      setCitas((actuales) =>
+        actuales.map((cita) =>
+          cita.id === editandoId ? citaGuardada : cita
+        )
+      );
+
+      setEditandoId(null);
+    } catch (err) {
+      console.error("Error al actualizar cita:", err);
+      setError("No se pudieron guardar los cambios.");
+    } finally {
+      setProcesandoId(null);
+    }
   }
 
   return (
     <section className="citas-seccion py-5">
       <div className="container">
-
         <div className="text-center mb-5">
           <span className="detalle-etiqueta">
             🐾 Tus reservas
@@ -90,7 +153,21 @@ function AppointmentsList() {
           </Link>
         </div>
 
-        {citas.length === 0 ? (
+        {error && (
+          <div className="alert alert-danger" role="alert">
+            {error}
+          </div>
+        )}
+
+        {cargando ? (
+          <p className="text-center">
+            Cargando citas...
+          </p>
+        ) : error && citas.length === 0 ? (
+          <p className="text-center text-muted">
+            No fue posible mostrar las citas.
+          </p>
+        ) : citas.length === 0 ? (
           <div className="citas-vacio mx-auto text-center">
             <div className="citas-vacio-icono">
               🐶
@@ -114,16 +191,14 @@ function AppointmentsList() {
           </div>
         ) : (
           <div className="row g-4">
-            {citas.map((cita, index) => (
+            {citas.map((cita) => (
               <div
                 className="col-md-6 col-lg-4"
-                key={index}
+                key={cita.id}
               >
                 <div className="card cita-card h-100">
-
                   <div className="card-body p-4">
                     <div className="d-flex justify-content-between align-items-start mb-3">
-
                       <div className="cita-icono">
                         🐾
                       </div>
@@ -158,7 +233,8 @@ function AppointmentsList() {
                       <button
                         type="button"
                         className="btn btn-outline-primary flex-fill"
-                        onClick={() => comenzarEdicion(index)}
+                        disabled={procesandoId !== null}
+                        onClick={() => comenzarEdicion(cita)}
                       >
                         Editar
                       </button>
@@ -166,15 +242,17 @@ function AppointmentsList() {
                       <button
                         type="button"
                         className="btn btn-outline-danger flex-fill"
-                        onClick={() => eliminarCita(index)}
+                        disabled={procesandoId !== null}
+                        onClick={() => eliminarCita(cita.id)}
                       >
-                        Eliminar
+                        {procesandoId === cita.id
+                          ? "Procesando..."
+                          : "Eliminar"}
                       </button>
                     </div>
 
-                    {editandoIndex === index && (
+                    {editandoId === cita.id && (
                       <div className="cita-edicion mt-4">
-
                         <h3 className="h5 mb-3">
                           Editar reserva
                         </h3>
@@ -237,29 +315,30 @@ function AppointmentsList() {
                         <button
                           type="button"
                           className="btn btn-success w-100"
+                          disabled={procesandoId !== null}
                           onClick={guardarEdicion}
                         >
-                          Guardar cambios
+                          {procesandoId === cita.id
+                            ? "Guardando..."
+                            : "Guardar cambios"}
                         </button>
 
                         <button
                           type="button"
                           className="btn btn-link w-100 mt-2"
-                          onClick={() => setEditandoIndex(null)}
+                          disabled={procesandoId !== null}
+                          onClick={() => setEditandoId(null)}
                         >
                           Cancelar
                         </button>
-
                       </div>
                     )}
-
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-
       </div>
     </section>
   );

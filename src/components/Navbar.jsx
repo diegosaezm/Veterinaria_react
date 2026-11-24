@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-
+import { useCart } from "../context/CartContext";
 function Navbar() {
   const [menuAbierto, setMenuAbierto] = useState(false);
-
+  const { carrito } = useCart();
+  const cantidadTotal = carrito.reduce((total, p) => total + p.cantidad, 0);
   function cerrarMenu() {
     setMenuAbierto(false);
   }
@@ -44,7 +44,11 @@ function Navbar() {
             </li>
 
             <li className="nav-item">
-              <NavLink className="nav-link" to="/servicios" onClick={cerrarMenu}>
+              <NavLink
+                className="nav-link"
+                to="/servicios"
+                onClick={cerrarMenu}
+              >
                 Servicios
               </NavLink>
             </li>
@@ -68,6 +72,21 @@ function Navbar() {
                 onClick={cerrarMenu}
               >
                 Agendar hora
+              </NavLink>
+            </li>
+
+            <li className="nav-item">
+              <NavLink
+                className="nav-link"
+                to="/productos"
+                onClick={cerrarMenu}
+              >
+                Productos
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/carrito" onClick={cerrarMenu}>
+                🛒 Carrito ({cantidadTotal})
               </NavLink>
             </li>
           </ul>
